@@ -10,11 +10,7 @@
 #define IN3 7
 #define IN4 8
 
-int KI=1,KD=1,KP=1;
-int dt=10;
-int speed1 = 70;
-int speed2 = 100;
-int leftS, rightS;
+int leftS = 0, rightS = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -30,8 +26,8 @@ void setup() {
   pinMode(IN2, OUTPUT);
   pinMode(IN3, OUTPUT);
   pinMode(IN4, OUTPUT);
-  
-  int leftSum, rightSum;
+
+    int leftSum = 0, rightSum = 0;
   for (int i = 0; i < 20; i++) {
     leftSum += analogRead(LEFT);
     rightSum += analogRead(RIGHT);
@@ -42,14 +38,17 @@ void setup() {
   Serial.begin(9600);
 }
 
-
+int KI=1,KD=1,KP=1;
+int dt=10;
+int speed1 = 70;
+int speed2 = 100;
 
 void loop() {
   // put your main code here, to run repeatedly:
-  int lerr = analogRead(LEFT) - leftS;//-780;
-  lerr /= 5;
+  int lerr = analogRead(LEFT) - leftS;
+  //lerr /= 4;
   int rerr = analogRead(RIGHT) + rightS;
-  rerr /= 3;
+  //rerr /= 5;
   int err = (lerr+rerr)/2;
   int correction = KP*err;
   Serial.print(lerr);
@@ -57,13 +56,13 @@ void loop() {
   Serial.println(rerr);
 //  Serial.println(correction);
 
-  //turning? make it go forward
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
-  analogWrite(PWM1, speed1-correction);
-  analogWrite(PWM2, speed2+correction);
+//  //turning? make it go forward
+//  digitalWrite(IN1, HIGH);
+//  digitalWrite(IN2, LOW);
+//  digitalWrite(IN3, LOW);
+//  digitalWrite(IN4, HIGH);
+//  analogWrite(PWM1, speed1-correction);
+//  analogWrite(PWM2, speed2+correction);
 
   //check if need to turn
   
