@@ -10,6 +10,12 @@
 #define IN3 7
 #define IN4 8
 
+int KI=1,KD=1,KP=1;
+int dt=10;
+int speed1 = 70;
+int speed2 = 100;
+int leftS, rightS;
+
 void setup() {
   // put your setup code here, to run once:
   pinMode(FRONT, INPUT);
@@ -25,19 +31,24 @@ void setup() {
   pinMode(IN3, OUTPUT);
   pinMode(IN4, OUTPUT);
   
+  int leftSum, rightSum;
+  for (int i = 0; i < 20; i++) {
+    leftSum += analogRead(LEFT);
+    rightSum += analogRead(RIGHT);
+  }
+  leftS = leftSum / 20;
+  rightS = rightSum / 20;
+  
   Serial.begin(9600);
 }
 
-int KI=1,KD=1,KP=1;
-int dt=10;
-int speed1 = 70;
-int speed2 = 100;
+
 
 void loop() {
   // put your main code here, to run repeatedly:
-  int lerr = analogRead(LEFT);//-780;
+  int lerr = analogRead(LEFT) - leftS;//-780;
   lerr /= 5;
-  int rerr = analogRead(RIGHT);
+  int rerr = analogRead(RIGHT) + rightS;
   rerr /= 3;
   int err = (lerr+rerr)/2;
   int correction = KP*err;
