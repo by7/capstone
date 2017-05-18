@@ -40,29 +40,42 @@ void setup() {
 
 int KI=1,KD=1,KP=1;
 int dt=10;
-int speed1 = 70;
-int speed2 = 100;
+int speed1 = 80;
+int speed2 = 95;
 
 void loop() {
   // put your main code here, to run repeatedly:
-  int lerr = analogRead(LEFT) - leftS;
-  //lerr /= 4;
-  int rerr = analogRead(RIGHT) + rightS;
-  //rerr /= 5;
+  int lerr = -analogRead(LEFT) + leftS;
+  int rerr = analogRead(RIGHT) - rightS;
   int err = (lerr+rerr)/2;
   int correction = KP*err;
-  Serial.print(lerr);
-  Serial.print(' ');
-  Serial.println(rerr);
 //  Serial.println(correction);
 
-//  //turning? make it go forward
-//  digitalWrite(IN1, HIGH);
-//  digitalWrite(IN2, LOW);
-//  digitalWrite(IN3, LOW);
-//  digitalWrite(IN4, HIGH);
-//  analogWrite(PWM1, speed1-correction);
-//  analogWrite(PWM2, speed2+correction);
+
+
+  int s1 = speed1-correction;
+  int s2 = speed2+correction*speed1/speed2;
+
+  if(s1<0)
+    s1 = 0;
+  else if(s1>150)
+    s1 = 150;
+  if(s2<0)
+    s2 = 0;
+  else if(s2>150)
+    s2 = 150;
+
+  Serial.print(s1);
+  Serial.print(' ');
+  Serial.println(s2);
+    //turning? make it go forward
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+  
+  analogWrite(PWM1, s1);
+  analogWrite(PWM2, s2);
 
   //check if need to turn
   
