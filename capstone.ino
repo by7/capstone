@@ -11,6 +11,9 @@
 
 int leftS = 940, rightS = 940;
 
+void turn(int dir); // 0 for left +1 for right
+int getCorrection(int err);
+
 void setup() {
   // put your setup code here, to run once:
   pinMode(FRONT, INPUT);
@@ -48,22 +51,27 @@ int speed1 = 95;
 int speed2 = 95;
 int pError=0;
 int integral=0;
+int front;
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  front = analogRead(FRONT);
+  Serial.println(front);
+
   int lerr = -analogRead(LEFT) + leftS;
   int rerr = analogRead(RIGHT) - rightS;
   int err = (lerr+rerr)/2;
   
-  int derivative = (pError-err)/dt;
-  pError = err;
-  integral += err*dt;
+  int correction = getCorrection(err);
+  if(front>300)
+    correction = 0;
   
-  Serial.println(analogRead(FRONT));
-  int correction = KP*err + KD*derivative;
-
+  if(front>800){
+    if(err<0)
+      turn(1);
+    else
+      turn(0);
+  }
   
-
   int s1 = speed1-correction;
   int s2 = speed2+correction*3/4;
 
@@ -90,3 +98,29 @@ void loop() {
   
   delay(dt);
 }
+
+int getCorrection(int err){
+  int derivative = (pError-err)/dt;
+  pError = err;
+  integral += err*dt;
+  
+  return KP*err + KD*derivative;
+}
+
+void turn(int dir){
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, HIGH);
+  delay(1000);
+  
+  digitalWrite(IN1+2*dir, LOW);
+  digitalWrite(IN2+2*dir, HIGH);
+  digitalWrite(IN3-2*dir, LOW);
+  digitalWrite(IN4-2*dir, HIGH);
+  
+  analogWrite(PWM1+dir, 10);
+  analogWrite(PWM2-dir, 150);
+  delay(1000);
+}
+
