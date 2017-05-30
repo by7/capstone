@@ -1,4 +1,3 @@
-
 #define FRONT 18
 #define LEFT 17
 #define RIGHT 19
@@ -53,29 +52,46 @@ int speed2 = 95;
 int pError=0;
 int integral=0;
 int front, left, right;
+int leftWall, rightWall;
+bool ignoreSide = false;
 
 void loop() {
   front = analogRead(FRONT);
-  Serial.println(front);
   left = analogRead(LEFT);
   right = analogRead(RIGHT);
-  //Serial.println(analogRead(LEFT));
-  //Serial.println(analogRead(RIGHT));
+  
+//  Serial.print("Front: ");
+//  Serial.println(front);  
+//  Serial.print("Left: ");
+//  Serial.println(left);
+//  Serial.print("Right: ");
+//  Serial.println(right);
+  
+  leftWall = left > 500;
+  rightWall = right > 500;
+  
   int lerr = -left + leftS;
   int rerr = right - rightS;
-  int err = (lerr+rerr)/2;
   
+  int err = (lerr+rerr)/2;
+    if (!leftWall) {
+    err = lerr;
+  } else if (!rightWall)
+    err = rerr;
   int correction = getCorrection(err);
-  if(front>300)
+  
+  if(front>300) {
     correction = 0;
   
-  if(front>800){
+  }if(front>800){
     if(right<left) //turn rught
       turn(1);
     else
       turn(0); //turn leftsk
   }
-  
+
+
+      
   int s1 = speed1-correction;
   int s2 = speed2+correction*3/4;
 
@@ -119,21 +135,26 @@ void turn(int dir){
   digitalWrite(IN4, HIGH);
   delay(500);
 
-  if (dir == 1) {
+  if (dir == 1) { //right
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
   digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);    
+  digitalWrite(IN4, LOW);  
+
+  analogWrite(PWM1, 150);
+  analogWrite(PWM2, -150);
+
+  delay(400);
   }
   else if (dir == 0) {
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, HIGH);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, HIGH);
-  }
-  
-  analogWrite(PWM1+dir, 10);
-  analogWrite(PWM2-dir, 100);
-  delay(450);
-}
 
+  analogWrite(PWM1, -150);
+  analogWrite(PWM2, 155);
+
+  delay(400);
+  } 
+}
