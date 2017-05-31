@@ -74,10 +74,12 @@ void loop() {
   int rerr = right - rightS;
   
   int err = (lerr+rerr)/2;
+
+  //accounts for open walls and pockets
     if (!leftWall) {
-    err = lerr;
-  } else if (!rightWall)
     err = rerr;
+  } else if (!rightWall)
+    err = lerr;
   int correction = getCorrection(err);
   
   if(front>300) {
@@ -144,8 +146,8 @@ void turn(int dir){
   analogWrite(PWM1, 150);
   analogWrite(PWM2, -150);
 
-  delay(400);
-  }
+  delay(500);
+  } //left
   else if (dir == 0) {
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, HIGH);
@@ -155,6 +157,6 @@ void turn(int dir){
   analogWrite(PWM1, -150);
   analogWrite(PWM2, 155);
 
-  delay(400);
+  delay(500);
   } 
 }
