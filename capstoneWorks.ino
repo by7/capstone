@@ -48,7 +48,7 @@ void setup() {
   delay(1000);
 }
 
-double KI=1,KD=1,KP=1; //changed from int to double to fine tune
+double KI=1,KD=0.9,KP=1; //changed from int to double to fine tune
 int dt=10;
 int speed1 = 100;
 int speed2 = 95;
@@ -57,7 +57,6 @@ int pError=0;
 int correction = 0;
 int front, left, right;
 bool leftWall, rightWall, pLeftWall = true, pRightWall = true;
-bool ignoreSide = false;
 int counter[2] = {0, 0}; //accounts for short stretch of wall
 int pLeft = 0, pRight = 0;
 void loop() {
@@ -75,7 +74,7 @@ void loop() {
 
   //is there a wall?
   leftWall = left > (leftS-250); //used to be 650
-  rightWall = right > (rightS-225);
+  rightWall = right > (rightS-200);
   pLeft = counter[0];
   pRight = counter[1];
   if (leftWall != pLeftWall) {
@@ -95,34 +94,38 @@ void loop() {
   int err = (lerr+rerr)/2;
 
   //accounts for open walls and pockets
+
   if (!rightWall && !leftWall) {
     err = 0;
   }else if (!leftWall) {
       //digitalWrite(LED, HIGH);
-    err = rerr/3;
+      err = rerr/3;
   } else if (!rightWall) {
-    digitalWrite(LED, HIGH);
-    err = lerr;
+      digitalWrite(LED, HIGH);
+      err = lerr/3;
   }
+    
   
   //int correction = (int) getCorrection(err);
   if(front<700){
-  if (counter[0] == pLeft && counter[1] == pRight) {
-    correction = (int) getCorrection(err);
+    
+    if (counter[0] == pLeft && counter[1] == pRight) {
+      correction = (int) getCorrection(err);
+    }
+    if (counter[0] > 10) {
+      counter[0] = 0;
+      correction = 0;
+      pLeftWall =leftWall;
+    } if (counter[1] > 10) {
+      counter[1] = 0;
+      correction = 0;
+      pRightWall =rightWall;
+    } 
   }
-  if (counter[0] > 10) {
-    counter[0] = 0;
-    correction = 0;
-    pLeftWall =leftWall;
-  } if (counter[1] > 10) {
-    counter[1] = 0;
-    correction = 0;
-    pRightWall =rightWall;
-  } 
-  }
-  if(front>780) {
-    correction = 0;
-  }
+  
+//  if(front>=770) {
+//    correction = 0;
+//  }
   if(front>800){
     //correction = 0; //was commented out for some reason?
     if(right<left) //turn rught
@@ -191,7 +194,7 @@ void turn(int dir){
   analogWrite(PWM1, 150);
   analogWrite(PWM2, 150);
 
-  delay(240); //tree-fiddy
+  delay(235); //tree-thirty five
   
   } //left
   else if (dir == 0) {
@@ -203,7 +206,7 @@ void turn(int dir){
   analogWrite(PWM1, 150);
   analogWrite(PWM2, 150);
 
-  delay(240); //tree-fiddy
+  delay(235); //tree-fiddy
   } 
 
   digitalWrite(IN1, HIGH);
@@ -214,4 +217,12 @@ void turn(int dir){
   analogWrite(PWM2, 0);
   delay(500);
   pError = 0;
+
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+  analogWrite(PWM1, 100);
+  analogWrite(PWM2, 100);
+  delay(100);
 }
